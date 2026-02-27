@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style.css">
+    <script src="https://cdn.jsdelivr.net/npm/fabric@6.4.3/dist/index.js"></script>
+    <title>Circuit Maker</title>
+    
+</head>
+
+<body>
+    
+    <div class="container">
+        <header>
+            <h1>Circuit Maker</h1>
+            <nav>
+        <ul>
+            <a href="index.html"><img src="./images/home_icon.png" style="width:50px;height:50px;"></a>
+            <a href="library.html"><img src="./images/library_icon.png" alt="Library" style="width:50px;height:50px;"></a>
+        </ul>
+    </nav>
+        </header>
+        <div class="main-content">
+            <aside class="sidebar" style="order: 0; border-right: 1px solid #ddd; border-left: none;">
+
+                <h2>Components</h2>
+                <div>
+                    <button onclick="myApp.componentManager.addComponent('./images/light_bulb_off.png', 'Light Bulb')">Add Light Bulb</button>
+                </div>
+                <div>
+                    <button onclick="myApp.componentManager.addComponent('./images/resistor.png', 'Resistor')">Add Resistor</button>
+                </div>
+                <div>
+                    <button onclick="myApp.componentManager.addComponent('./images/source.png', 'Voltage Source')">Add Voltage Source</button>
+                </div>
+                <div>
+                    <button onclick="myApp.componentManager.addComponent('./images/switch_off.png', 'Switch')">Add Switch</button>
+                </div>
+            </aside>
+            <aside class="sidebar" style="order: 2; border-right: none; border-left: 1px solid #ddd;">
+                
+                <h2>Properties</h2>
+                <div>
+                    <label for="resistance">Resistance (Ω):</label>
+                    <input type="number" id="resistance" placeholder="0" disabled>
+                </div>
+                <div>
+                    <label for="voltage">Voltage (V):</label>
+                    <input type="number" id="voltage" placeholder="0" disabled>
+                </div>
+                <div>
+                    <label for="current">Current (A):</label>
+                    <input type="number" id="current" placeholder="0" disabled>
+                </div>
+                
+            </aside>
+            <main>
+                <div class="fabric-canvas-container" id="fabric-canvas-container">
+                    <canvas id="canvas" width="1400" height="1000"></canvas>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script type="module" src="./javascript/main.js"> </script>
+
+
+
+    
+</body>
+
+</html>

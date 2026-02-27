@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style.css">
+    <title>Circuit Maker</title>
+    
+</head>
+
+<body>
+<header>
+    <h1>Circuit Maker</h1>
+    <nav>
+        <ul>
+            <a href="index.html"><img src="./images/home_icon.png" style="width:50px;height:50px;"></a>
+            <a href="library.html"><img src="./images/library_icon.png" alt="Library" style="width:50px;height:50px;"></a>
+        </ul>
+    </nav>
+</header>
+
+<main>
+    <nav>
+       
+    </nav>
+    <section id="Library">
+        <h2>Library</h2>
+        <p>
+            This librabry contains the components that can be used to create circuits.
+             You can add components to the canvas by clicking on the buttons in the library.
+              Each component has its own properties that can be edited in the properties panel.
+        </p>
+    </section>
+    <div class ="library-container">
+        <div class ="component-container">
+            <label for="light_bulb">Light Bulb</label>
+            <img src="./images/light_bulb_off.png" alt="Light Bulb">
+            <p>In this simulator, a <b>Light Bulb</b> acts as a resistor that emits light when current flows.
+                 While real-world filament resistance increases with temperature, we assume a <b>constant resistance</b> here for consistent simulation results.</p>
+            </div>
+        <div class ="component-container">
+            <label for="resistor">Resistor</label>
+            <img src="./images/resistor.png" alt="Resistor">
+            <!-- The following description of a resistor is based on the information provided in the Wikipedia article on resistors. https://en.wikipedia.org/wiki/Resistor -->
+            <p>A <b>Resistor</b> is a passive electrical component that resists the flow of electric current.
+                 It is used to control the amount of current flowing through a circuit.</p><p> It's <b>resistance R</b> is measured <b>in ohms Ω</b>.
+                Ohms Law states that the current I flowing through a resistor is directly proportional to the voltage V
+                 across it and inversely proportional to its resistance R, which can be expressed as <b>I = V / R</b>.   
+                 </p><p>
+                  <a href="https://en.wikipedia.org/wiki/Resistor">Learn more about resistors here</a>.
+            </p>
+            </div>
+        <div class ="component-container">
+            <label for="voltage_source">Voltage Source</label>
+            <img src="./images/source.png" alt="Voltage Source">
+            <!-- The following description of a voltage source is based on the information provided in the Wikipedia article on voltage sources. https://en.wikipedia.org/wiki/Voltage_source -->
+           <p>
+        A <b>Voltage Source</b> provides a constant potential difference across its terminals to supply power to a circuit. Voltage is measured in <b>Volts (V)</b>.
+    </p>
+
+    <p>
+        In this simulator, each source includes a small <b>internal resistance</b> to better mimic real-world components,
+         like the batteries found in an electronics kit.
+    </p>
+
+    <p >
+        <strong>Safety Warning:</strong> If the current through a source rises too high, it indicates a <b>short circuit</b>. While the simulator will simply show a high current, a real-world voltage source would likely be damaged or overheat. Avoid connecting voltage sources in parallel or directly to a short circuit.
+    </p>
+
+    <p>
+        <a href="https://en.wikipedia.org/wiki/Voltage_source" target="_blank">Learn more about voltage sources here</a>.
+    </p>
+            </div>
+        <div class ="component-container">
+            <label for="switch">Switch</label>
+            <img src="./images/switch_off.png" alt="Switch">
+            <p>A <b>Switch</b> is a component that can be used to open or close a circuit.
+                 It allows you to control the flow of current in a circuit without having to disconnect the wires.</p>
+            </div>
+
+    </div>
+</main>
+
+<footer>
+    <p>2026 Circuit Maker</p>
+</footer>
+
+
+
+    
+</body>
+
+</html>

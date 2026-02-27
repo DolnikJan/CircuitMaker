@@ -1,0 +1,258 @@
+/*------Used copilot to generate the initial CSS file, then manually edited for responsiveness and design improvements.------*/
+/* --- Global Theme & Reset --- */
+:root {
+    background-color: white;
+}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+html, body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    height: 100%; 
+    width: 100%;
+    /* Prevents the rubber-band scroll effect on mobile */
+    overscroll-behavior-y: none; 
+}
+
+/* --- Base Layout --- */
+.container {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding-bottom: env(safe-area-inset-bottom); /* Keeps the swipe-bar protection */
+}
+.library-container {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 10px;
+    min-height: 100vh;
+}
+.component-container {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    border:2px solid #ccc;
+    border-radius: 10px;
+    box-sizing: border-box;
+    flex: 1 1 25%;
+}
+.component-container label {
+    font-weight: bold;
+    margin-top: 5px;
+    font-size: 30px;
+    text-align: center;
+}
+.component-container img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+}
+.main-content {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+}
+
+/* --- Header --- */
+header {
+    display: flex;
+    align-items: center; 
+    justify-content: space-between; 
+    padding: 10px 20px;
+    background-color: rgb(82, 125, 217);
+    color: white;
+}
+
+header h1 {
+    flex-grow: 1;    
+    text-align: center; 
+    margin: 0;         
+    font-size: 30px;
+}
+
+header nav ul {
+    display: flex;
+    gap: 15px;         
+    list-style: none;  
+    margin: 0;
+    padding: 0;
+}
+/* --- Footer --- */
+footer {
+    background-color: rgb(82, 125, 217);
+    color: white;
+    padding: 20px;
+    text-align: center;
+    width: 100%;
+
+}
+
+/* --- Sidebars --- */
+.sidebar {
+    background-color: white;
+    padding: 8px;
+    width:220px;
+    overflow-y: auto;
+    display: flex;
+    flex-shrink: 0;
+    flex-direction: column;
+}
+.sidebar:last-of-type {
+    border-left: none;
+} 
+
+/* --- Sidebar Content --- */
+
+.sidebar div {
+    display: flex;
+    flex-direction: column; 
+    align-items: stretch; 
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+.sidebar button {
+    background-color: white;
+    border: 2px solid #ccc;
+    text-align: center;
+    padding: 8px;
+    margin: 5px 0;
+    display: block;
+    cursor: pointer;
+    border-radius: 5px;
+    height: 50px;
+    width: 100%; 
+}
+.sidebar button:hover {
+    background-color: rgb(213, 231, 245);
+    border-color: rgb(90, 140, 200);
+    box-shadow: 0 8px 5px rgba(0,0,0,0.1);
+    transform: translateY(-4px);
+}
+.sidebar button:active {
+    transform: translateY(2px);
+}
+.sidebar label {
+    margin: 0 0 5px 0; 
+    font-weight: bold;
+    font-size: 14px;
+}
+.sidebar input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+}
+.sidebar input:disabled {
+    background-color: #f0f0f0;
+    border-color: #ddd;
+} 
+
+main {
+    flex:1;
+    position:relative;
+    overflow:hidden;
+    min-width: 0;
+    min-height: 0;
+}
+.fabric-canvas-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    touch-action: none;
+}
+#canvas {
+    display: block;
+}
+
+/* =========================================
+   MOBILE RESPONSIVE QUERIES 
+========================================= */
+@media (max-width: 768px) {
+    .main-content {
+        flex-direction: column;
+        overflow-x:hidden;
+    }
+    
+    header {
+        display: flex;
+        justify-content: center; 
+        padding: 8px;
+    }
+    header h1 {
+        font-size: 30px; 
+    }
+    .a img{
+        width: 30px;
+        height: 30px;
+        margin: 0 10px;
+    }
+    .component-container {
+        flex: 1 1 100%; 
+    }
+
+    .sidebar {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        overflow-x: hidden;
+        padding: 8px;
+        align-items: flex-start;
+        gap:10px;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid #ddd;
+    }
+    
+    .sidebar div {
+        flex: 1 1 100px; 
+        margin-bottom: 0; 
+    }
+    
+    .sidebar button {
+        margin:0;
+        height:auto;
+        padding: 8px 12px;
+    }
+    
+    .sidebar h2 {
+        display: none;
+    }
+    
+    .sidebar:last-of-type {
+        border-left: none;
+        border-top: 1px solid #ddd; 
+    } 
+}
+
+@media (max-height: 600px) {
+    header {display:none;}
+    main {
+        padding-bottom: 2px;
+    }
+    .main-content {
+        flex-direction: row;
+    }
+    .sidebar {
+        width: 150px;           
+        flex-direction: column;  
+        flex-wrap: nowrap;      
+        overflow-x: hidden;      
+        overflow-y: auto;      
+        justify-content: flex-start; 
+        border-bottom: none;
+    }
+    .sidebar div {
+        margin-bottom: 10px;
+    }
+}
