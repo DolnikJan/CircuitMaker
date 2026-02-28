@@ -10,7 +10,7 @@ export class Component {
     current = 0;
     resistance = 0;
      number = -1;
-
+    //Replaces oldNode with newNode in the component's connections. used for merging nodes together when connecting components.
      replaceNode(oldNode, newNode) {
         if (this.minusNode  === oldNode) {
             this.minusNode  = newNode;
@@ -70,12 +70,6 @@ export class Resistor extends Component {
 
 }
 
-export class LightBulb extends Component {
-    constructor(resistance) {
-        super("Light Bulb");
-        this.resistance = resistance;
-    }
 
-}
 
 

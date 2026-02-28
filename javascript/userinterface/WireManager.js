@@ -7,9 +7,8 @@
             connectingFrom = null;
             connectingTo = null;
             allLines = [];
-
             startConnecting(component) {
-                console.log("starting to connect from component:", component);
+                console.log("started connecting");
                 this.circuitManager.mode = 'connect';
                 this.circuitManager.componentManager.selectedComponent = component;
                 let strokeColor = component.lineColor;
@@ -29,23 +28,13 @@
                 this.canvas.add(this.connectingLine);
                 this.canvas.bringObjectToFront(this.connectingLine);
                 this.canvas.requestRenderAll();
-                console.log("added connecting line:", this.connectingLine);
-                /*
-                this.canvas.on('mouse:move', (options) => {
-                    if (this.circuitManager.mode) {
-                        let pointer = this.canvas.getPointer(options.e);
-                        this.connectingLine.set({ x2: pointer.x, y2: pointer.y });
-                        this.canvas.requestRenderAll();
-                    }
-                });
-*/
+              
             }
+            
             stopConnecting(component) {
                 this.circuitManager.mode = 'select';
-                console.log("stopping connecting to component:", component);
                 if (component != null) {
                     this.connectComponents(this.circuitManager.componentManager.selectedComponent, component);
-                    //this.canvas.off('mouse:move');
                 }
                 this.circuitManager.mode = 'select';
                 if (this.connectingLine) {
@@ -55,7 +44,6 @@
                 }
             }
             connectComponents(component1, component2) {
-                console.log("connecting components:", component1, component2);
 
                 let positions1 = this.circuitManager.componentManager.getConnectionPositions(component1);
                 let positions2 = this.circuitManager.componentManager.getConnectionPositions(component2);
@@ -67,7 +55,6 @@
                 if (this.connectingTo === "minus") {
                     index2 = 1;
                 }
-                console.log("connection positions:", positions1, positions2);
                 let strokeColor = component1.lineColor;
                 const line = new fabric.Line([positions1[index1].x, positions1[index1].y, positions2[index2].x, positions2[index2].y], {
                     stroke: `rgb(${strokeColor[0]}, ${strokeColor[1]}, ${strokeColor[2]})`,
@@ -91,24 +78,19 @@
                     width: 4,
                 });
                 line.entityType = 'line';
-
-
-
                 this.connectingFrom = null;
                 this.connectingTo = null;
                 component1.lines1.push(line);
                 component2.lines2.push(line);
                 this.allLines.push(line);
                 this.canvas.add(line);
-                console.log("added line:", line);
-
-                this.canvas.bringObjectToFront(line);
+                this.canvas.moveObjectTo(line, this.circuitManager.gridManager.bottom-1);
                 this.canvas.requestRenderAll();
-                console.log("connected components with line:", line);
                 this.circuitManager.calculateCircuit();
 
                 return line;
             }
+            //Removes hte line and its connections to the components, and updates the circuit accordingly.
             disconnectComponents(line) {
                 if (!line.connectedFromComponent || !line.connectedToComponent) {
                     console.error("Line is not properly connected:", line);
@@ -124,6 +106,7 @@
                 this.canvas.remove(line);
                 this.canvas.requestRenderAll();
             }
+            //Determines to which terminal we are connecintg based on the position of the pointer
             setConnectingTo(component, pointer) {
                 let positions = this.circuitManager.componentManager.getConnectionPositions(component);
                 let distanceToPlus = Math.hypot(pointer.x - positions[0].x, pointer.y - positions[0].y);
@@ -134,7 +117,7 @@
                     this.connectingTo = "minus";
                 }
             }
-
+            //Starts/Stops the mode of deleting lines and shows/hides the lines that can be deleted accordingly.
             toggleLineDeletionMode() {
                 if (this.circuitManager.mode === 'lineDeletion') {
                     this.circuitManager.mode = 'select';
@@ -160,16 +143,8 @@
                         this.canvas.bringObjectToFront(line);
                     });
                     this.canvas.defaultCursor = 'crosshair';
-                    /*
-                    this.canvas.on('mouse:down', (options) => {
-                        if (options.target && options.target.type === 'line') {
-                            this.disconnectComponents(options.target);
-                        }
-                    });*/
                 } else {
                     this.canvas.defaultCursor = 'default';
-
-                    /*this.canvas.off('mouse:down');*/
                     this.circuitManager.componentManager.selectedComponent.lines1.forEach((line) => {
                         line.set({
                             selectable: false,

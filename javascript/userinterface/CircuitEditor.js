@@ -3,7 +3,7 @@ import { ComponentManager } from './ComponentManager.js';
 import { WireManager } from './WireManager.js';
 import { UIManager } from './UIManager.js';
 import { Circuit } from '../model/Circuit.js';
-import { VoltageSource, Resistor, LightBulb } from '../model/Components.js';
+import { VoltageSource } from '../model/Components.js';
 import { ModifiedNodalAnalysis } from '../math/ModifiedNodalAnalysis.js';
 export class CircuitEditor {
     constructor(canvas) {
@@ -22,8 +22,9 @@ export class CircuitEditor {
     componentManager;
     wireManager;
     uiManager;
-    zoom;
     mapping;
+    resizeTimeout;
+    eventTimer=false;
 
 
 
@@ -31,42 +32,11 @@ export class CircuitEditor {
         this.mode = newMode;
     }
 
-    resizeCanvas() {
-        //https://fabricjs.com/docs/old-docs/fabric-intro-part-5/
-        let main = document.querySelector('main');
-        let containerWidth = main.clientWidth;
-        let containerHeight = main.clientHeight;
-        this.canvas.setDimensions({
-            width: containerWidth,
-            height: containerHeight
-        });
-
-
-        console.log('Resizing canvas to fit container:', containerWidth, containerHeight);
-        this.zoom = Math.min(containerWidth / this.gridManager.designWidth, containerHeight / this.gridManager.designHeight);
-        console.log('Calculated zoom:', this.zoom);
-        this.canvas.setZoom(this.zoom);
-
-        //Centering the canvas on the grid, helped with Copilot----
-        const panX = (containerWidth - (this.gridManager.designWidth * this.zoom)) / 2;
-        const panY = (containerHeight - (this.gridManager.designHeight * this.zoom)) / 2;
-
-        let viewportTransform = this.canvas.viewportTransform;
-        viewportTransform[4] = panX;
-        viewportTransform[5] = panY;
-        //-------
-
-
-        this.canvas.requestRenderAll();
-        this.canvas.calcOffset();
-
-
-
-    }
-
+    //Binds all the event listeners for interacting with the canvas
     bindEvents() {
         this.canvas.on('mouse:down', (options) => {
             let target = options.target;
+            console.log(target);
             if (!target) {
                 this.uiManager.hideButtons();
                 if (this.mode === 'lineDeletion') {
@@ -93,7 +63,6 @@ export class CircuitEditor {
 
                     if (this.componentManager.timer) {
                         if (target.name === "Switch") {
-                            console.log("double clicked switch");
                             this.componentManager.turnSwitch(target);
                             this.canvas.requestRenderAll();
                         }
@@ -120,39 +89,38 @@ export class CircuitEditor {
                     let parentComponent = target.parentComponent;
                     switch (target.buttonType) {
                         case "rotate":
-                            // console.log("rotating component");
                             this.componentManager.rotateComponent(parentComponent);
                             break;
                         case "delete":
-                            // console.log("deleting component");
                             this.componentManager.deleteComponent(parentComponent);
-                            
-            this.uiManager.hideButtons();
+
+                           
                             break;
                         case "plus":
-                            // console.log("starting to connect from plus");
                             this.wireManager.connectingFrom = "plus";
                             this.wireManager.startConnecting(parentComponent);
-                            
-            this.uiManager.hideButtons();
+
+                            this.uiManager.hideButtons();
 
                             break;
                         case "minus":
-                            // console.log("starting to connect from minus");
                             this.wireManager.connectingFrom = "minus";
                             this.wireManager.startConnecting(parentComponent);
-                            
-            this.uiManager.hideButtons();
+
+                            this.uiManager.hideButtons();
                             break;
                         case "lineDeletion":
-                            // console.log("toggling line deletion mode");
                             this.wireManager.toggleLineDeletionMode();
-                            
-            this.uiManager.hideButtons();
+
+                            this.uiManager.hideButtons();
                             break;
                         default:
                             break;
                     }
+                    this.eventTimer =true;
+                        setTimeout(() => {
+                            this.eventTimer = false;
+                        }, 100);
                     break;
                 default:
                     break;
@@ -179,6 +147,7 @@ export class CircuitEditor {
         });
         this.canvas.on('mouse:move', (options) => {
             if (this.mode === 'connect' && this.wireManager.connectingLine) {
+                console.log("moving mouse while connecting");
                 let pointer = this.canvas.getPointer(options.e);
                 this.wireManager.connectingLine.set({
                     x2: pointer.x,
@@ -189,6 +158,9 @@ export class CircuitEditor {
             }
         });
         this.canvas.on('mouse:up', (options) => {
+            if(this.eventTimer){
+                return;
+            }
             let target = options.target;
             if (this.mode === 'connect') {
                 let pointer = this.canvas.getPointer(options.e);
@@ -202,14 +174,12 @@ export class CircuitEditor {
                         this.wireManager.setConnectingTo(targetComponent, pointer);
                         this.wireManager.stopConnecting(targetComponent);
                     } else {
-                        //this.wireManager.stopConnecting(null);
                     }
                 }
             }
             if (target && target.entityType === "component") {
                 this.gridManager.clearOldPositionOfComponent(target);
                 if (target.left > this.gridManager.designWidth - this.gridManager.gridOffsetX) {
-                    // console.log("deleting component");
                     this.componentManager.deleteComponent(target);
                     this.canvas.remove(target);
                     return;
@@ -233,51 +203,38 @@ export class CircuitEditor {
                     target.setCoords();
                     this.canvas.requestRenderAll();
                     this.componentManager.selectedComponent = target;
-                    //console.log("showing buttons for component:", target);
                     this.uiManager.showButtons(target);
                 }
                 this.componentManager.updateConnectionPositions(target);
             }
-            console.log("Calculating circuit...");
             this.calculateCircuit();
             this.canvas.requestRenderAll();
         });
+        window.addEventListener('resize', () => {
 
-
-
-
-        this.canvas.on('mouse:down', (options) => {
-            if (options.target == null) {
-                this.uiManager.hideButtons();
-                if (this.mode === 'lineDeletion') {
-                    this.wireManager.toggleLineDeletionMode();
-                }
-                //console.log('Canvas mouse down:');
-                if (this.mode === 'connect') {
-                    this.wireManager.stopConnecting(null);
-                }
-            }
+            clearTimeout(this.resizeTimeout);
+            this.resizeTimeout = setTimeout(() => this.gridManager.resizeCanvas(), 100);
         });
 
-
     }
+    //Inicialization
     init() {
         this.gridManager.drawGridLines(this.canvas);
         this.gridManager.drawBackground(this.canvas);
-
-
-        this.resizeCanvas();
+        this.gridManager.resizeCanvas();
         this.setMode("select");
+        this.bindEvents();
+        this.uiManager.initButtons();
     }
-
-    resizeTimeout;
-    /*window.addEventListener('resize', () => {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(() => this.resizeCanvas(), 100);
-});*/
+    //Prepares the userbuilt circuit for calculation 
     prepareCircuit() {
         let circuit = new Circuit();
         this.mapping = new Map();
+        //Creates a map of components on to canvas to their corresponding components in the circuit,
+        //  and also adds the components to the circuit. (every calculation creates its own new circuit,
+        //  the calculation itself doesnt modify the circuit that the user built,
+        //  it just reads from it and creates a new one based on it,
+        //  so that we can keep all the properties of the components in the user interface separate from the calculation)
         this.componentManager.allComponents.forEach((component) => {
             if (component.calculatorComponent) {
                 let value;
@@ -291,7 +248,7 @@ export class CircuitEditor {
 
             }
         });
-
+        //Connects the components in the circuit together based on the wires by merging nodes together
         for (let line of this.wireManager.allLines) {
             let mappedComponentFrom = this.mapping.get(line.connectedFromComponent);
             let fromNode = mappedComponentFrom.minusNode;
@@ -308,26 +265,24 @@ export class CircuitEditor {
         }
         this.myCircuit = circuit;
     }
+    //Updates values of each component in the circuit based on the results of the circuit calculation, and updates the lighbulb as well
     updateCircuit() {
         this.mapping.forEach((value, key) => {
             if (key.name !== "Switch") {
                 key.calculatorComponent.setVoltage(value.getVoltage());
                 key.calculatorComponent.setCurrent(value.getCurrent());
                 key.calculatorComponent.setResistance(value.getResistance());
-
                 if (key.name === "Light Bulb") {
-                    console.log("Updating brightness of bulb " + key.name);
                     this.componentManager.updateBrightnessOfBulb(key);
                 } else {
-                    console.log("Not a light bulb component: " + key.name);
                 }
             }
         });
     }
+    //calculates the circuit and updates the values of each component in the user interface based on the results
     calculateCircuit() {
         this.prepareCircuit();
         ModifiedNodalAnalysis.calculateCircuit(this.myCircuit);
-        console.log("Circuit calculation complete. Updating component values...");
         this.updateCircuit();
     }
 }

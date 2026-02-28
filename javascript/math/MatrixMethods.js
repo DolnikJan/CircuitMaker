@@ -15,7 +15,7 @@ export class MatrixMethods {
    
 
 //SOURCE https://gist.github.com/mqnc/bef8d090fdb7e531398ef68342ffe177
-
+//ITS JUST A MATRIX INVERSION FUNCTION, I didnt write it, but its so common that it basically could be a javascript built in function
 // Returns the inverse of matrix `M`.
     static matrix_invert(M) {
 	// I use Guassian Elimination to calculate the inverse:
@@ -109,9 +109,10 @@ export class MatrixMethods {
 	//matrix I should be the inverse:
 	return I;
 }
+//End of matrix inversion function
 
 
-     static multiplyMatrixByMatrix(matrix1, matrix2) {
+static multiplyMatrixByMatrix(matrix1, matrix2) {
     let result = this.createMatrix(matrix1.length, matrix2[0].length);
     for (let i = 0; i < matrix1.length; i++) {
         for (let j = 0; j < matrix2[0].length; j++) {

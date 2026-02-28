@@ -1,4 +1,4 @@
-import { Resistor, VoltageSource, LightBulb } from './Components.js';
+import { Resistor, VoltageSource, } from './Components.js';
 import { Node } from './Node.js';
 
 export class Circuit {
@@ -9,17 +9,10 @@ export class Circuit {
     createComponent(name, value) {
         let component;
         switch(name) {
-            /*case "Resistor":
-                component= new Resistor(value, this);
-                break;*/
             case "Voltage Source":
                 component= new VoltageSource(value, this);
                 this.voltageSources.push(component);
                 break;
-                /*
-            case "Light Bulb":
-                component= new LightBulb(value, this);
-                break;*/
             default:
                 component= new Resistor(value, this);
 
@@ -27,20 +20,20 @@ export class Circuit {
         this.components.push(component);
 
         
-        component.minusNode = this.createNewNode();
+        component.minusNode = this.createNode();
         component.minusNode.addComponent(component);
-        component.plusNode = this.createNewNode();
+        component.plusNode = this.createNode();
         component.plusNode.addComponent(component);
         return component;
     
     }
-    createNewNode(){
+    createNode(){
         let node = new Node();
         this.nodes.push(node);
         node.setCircuit(this);
         return node;
     }
-    
+    //Merges two nodes together, removing the old node and replacing it with the new node in all components attached to the old node. used for connecting components
     mergeNodes(oldNode, newNode){
         if(oldNode === newNode) return;
         for (let component of oldNode.components) {
@@ -49,6 +42,7 @@ export class Circuit {
         }
         this.nodes.splice(this.nodes.indexOf(oldNode), 1);
     }
+    //Creates a new circuit for each connected group of components and nodes(graph compoennt), and returns an array of the new circuits. Also removes any nodes with 0 or 1 components, and removes the components attached to those nodes as well.
     createSubCircuits() {
         let newCircuits= [];
         while(this.nodes.length > 0) {
@@ -94,6 +88,7 @@ export class Circuit {
         }
     setupCircuit(circuit) {
    let spliced = true;
+//removes any nodes with 0 or 1 components, and removes the components attached to those nodes as well.
     while (spliced) {
     spliced = false;
     for (let i = circuit.nodes.length - 1; i >= 0; i--) {
@@ -132,7 +127,7 @@ export class Circuit {
         }
     }
 }
-
+    //assigns numbers to the voltage sources and nodes for use in matrices.
     circuit.voltageSources.forEach(element => { element.number = circuit.voltageSources.indexOf(element); });
     circuit.nodes.forEach(element => { element.number = circuit.nodes.indexOf(element) - 1; });
  

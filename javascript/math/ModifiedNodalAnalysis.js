@@ -5,9 +5,6 @@ export class ModifiedNodalAnalysis{
  static  prepareMatrixG(circuit) {
     let activeNodesCount=circuit.nodes.length-1;
     let matrixG = MatrixMethods.createMatrix(activeNodesCount, activeNodesCount);
-    matrixG.forEach(element => {
-        console.log(element);
-    });
 
     for (let node of circuit.nodes) {
         if(node.number === -1) continue;
@@ -43,9 +40,8 @@ static prepareMatrixB(circuit) {
     }
     return matrixB;
 }
-
+//Prepares the A matrix for the MNA calculation, which combines the G, B, and C matrices into one matrix.
 static prepareMatrixA(circuit) {
-   //setupCircuit(circuit);
     let matrixG = this.prepareMatrixG(circuit);
     let matrixB = this.prepareMatrixB(circuit);
     let matrixC = MatrixMethods.transposeMatrix(matrixB);
@@ -73,6 +69,7 @@ static prepareMatrixA(circuit) {
         if(!source.minusNode || !source.plusNode ){
             matrixA[ matrixG.length + i][matrixG.length + i] = 1;
         }else{
+            //Adds a small conductance to the diagonal of the A matrix for voltage sources that are not connected to any nodes, to prevent the matrix from being singular and causing errors in the calculation.
             matrixA[ matrixG.length + i][matrixG.length + i] = -1e-6;
         }
     }
@@ -111,7 +108,6 @@ static calculateCircuit(circuit) {
 
     subCircuit.components.forEach(component => {
          if(component.minusNode  === null || component.plusNode  === null) {
-                console.log("Component " + component.getName() + " is not fully connected. Skipping voltage and current calculation.");
                 return;
             }
         if(component instanceof VoltageSource) {
@@ -132,7 +128,6 @@ static calculateCircuit(circuit) {
             component.setVoltage(Math.round(voltage * 100) / 100);
             component.setCurrent(Math.round(voltage / component.getResistance() * 100) / 100);
         }
-        console.log("Component: " + component.getName() + ", Voltage: " + component.getVoltage() + " Volts, Current: " + component.getCurrent() + " Amps");
     });
         });
 }

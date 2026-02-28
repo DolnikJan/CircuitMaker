@@ -16,8 +16,36 @@
                 this.setUpCanvasGrid();
             }
             bottom = 1;
+            zoom;
 
-            drawBackground(canvas) {
+                //Resizes the canvas to fit the window, making sure its as big as it can be
+            resizeCanvas() {
+                //https://fabricjs.com/docs/old-docs/fabric-intro-part-5/
+                let main = document.querySelector('main');
+                let containerWidth = main.clientWidth;
+                let containerHeight = main.clientHeight;
+                this.canvas.setDimensions({
+                    width: containerWidth,
+                    height: containerHeight
+                });
+                this.zoom = Math.min(containerWidth / this.designWidth, containerHeight / this.designHeight);
+                this.canvas.setZoom(this.zoom);
+
+                //Centering the canvas on the grid, helped with Copilot----
+                const panX = (containerWidth - (this.designWidth * this.zoom)) / 2;
+                const panY = (containerHeight - (this.designHeight * this.zoom)) / 2;
+                let viewportTransform = this.canvas.viewportTransform;
+                viewportTransform[4] = panX;
+                viewportTransform[5] = panY;
+                //-------
+                this.canvas.requestRenderAll();
+                this.canvas.calcOffset();
+
+
+
+            }
+            //Creates the gray, blue and red rectangles
+            drawBackground() {
                 const deskRectangle = new fabric.Rect({
                     left: 0,
                     top: 0,
@@ -55,7 +83,8 @@
                 this.bottom += 3;
                 this.canvas.renderAll();
             }
-            drawGridLines(canvas) {
+            //Draws the grid lines on the canvas, based on the grid size and offsets.
+            drawGridLines() {
                 let offset = this.gridSize / 2;
 
                 for (let i = 1; i < 11; i++) {
@@ -90,23 +119,22 @@
                         lockRotation: true,
                     });
 
-                    canvas.add(lineX);
-                    canvas.add(lineY);
-                    canvas.sendObjectToBack(lineX);
-                    canvas.sendObjectToBack(lineY);
+                    this.canvas.add(lineX);
+                    this.canvas.add(lineY);
+                    this.canvas.sendObjectToBack(lineX);
+                    this.canvas.sendObjectToBack(lineY);
                     this.bottom += 2;
                 }
-                canvas.requestRenderAll();
+                this.canvas.requestRenderAll();
             }
+            //Sets up the Array that keeps track of which grid positions are occupied by components, initializing it to be empty.
             setUpCanvasGrid() {
                 for (let i = 0; i < this.gridHeight; i += 1) {
                     this.canvasGrid.push(new Array(this.gridWidth).fill(null));
                 }
-                /*
-                canvasGrid.forEach(row => {
-                    console.log(row);
-                });*/
+             
             }
+            //Returns the adequate grid position for a given left and top position on the canvas
             getGridArrayFromPosition(left, top) {
 
                 let gridX = Math.round(left / this.gridSize) - this.gridArrayOffsetX;
@@ -116,22 +144,26 @@
                 }
                 return null;
             }
+            //Checks if a given grid position is empty (not occupied by a component)
             isGridPositionEmpty(gridX, gridY) {
                 if (gridY >= 0 && gridY < this.gridHeight && gridX >= 0 && gridX < this.gridWidth) {
                     return this.canvasGrid[gridY][gridX] == null;
                 }
                 return false;
             }
+            //Removes a component from the grid, setting its grid position to null in the canvasGrid array.
             removeComponentFromGrid(component) {
                 if (component.gridPositionY != null && component.gridPositionX != null) {
                     this.canvasGrid[component.gridPositionY][component.gridPositionX] = null;
                 }
             }
+            //Clears the old position of a component on the grid, setting it to null in the canvasGrid array.
             clearOldPositionOfComponent(component) {
                 if (component.startX != null && component.startY != null) {
                     this.canvasGrid[component.startY][component.startX] = null;
                 }
             }
+            //Adds a component to the grid at a specified grid position, and updates the component's gridPositionX and gridPositionY properties.
             addComponentToGrid(component, gridX, gridY) {
                 if (gridY >= 0 && gridY < this.gridHeight && gridX >= 0 && gridX < this.gridWidth) {
                     this.canvasGrid[gridY][gridX] = component;

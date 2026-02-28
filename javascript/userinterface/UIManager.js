@@ -27,13 +27,6 @@
             rotate_button;
             lineDeletionButton;
 
-            addButton(buttonName, url) {
-                let button = new fabric.Image.fromURL(url).then((img) => {
-                    this[buttonName] = img;
-                    this.buttonSetUp(img);
-                    return img;
-                });
-            }
             buttonSetUp(button) {
                 button.set({
                     hasControls: false,
@@ -141,10 +134,11 @@
                 this.hideButton(this.lineDeletionButton);
                 this.canvas.requestRenderAll();
             }
+            //Inicializes the buttons by setting up their properties and loading their images and
             initButtons() {
                 // Setup Text Label
                 this.text = new fabric.Text('', {
-                    left: 150, top: 100, fontSize: 150, fill: 'black', originX: 'center', originY: 'center', width: 1000, scaleX: 0.2, scaleY: 0.2,
+                    width: 1000,
                 });
                 this.buttonSetUp(this.text);
 
@@ -160,18 +154,14 @@
 
                 fabric.Image.fromURL('./images/minus_button.png').then((img) => {
                     this.minus_button = img; this.buttonSetUp(img);
-
-
                 });
 
                 fabric.Image.fromURL('./images/delete_button.png').then((img) => {
                     this.delete_button = img; this.buttonSetUp(img);
-
                 });
 
                 fabric.Image.fromURL('./images/rotate_button.png').then((img) => {
                     this.rotate_button = img; this.buttonSetUp(img);
-
                 });
 
                 fabric.Image.fromURL('./images/delete_line_button.png').then((img) => {
@@ -179,6 +169,7 @@
 
                 });
             }
+            //Sets the input fields to show the values of the component, and enables/disables them based on the type of the component.
             updateInputs(component) {
                 if (component.calculatorComponent) {
                     if (component.calculatorComponent instanceof VoltageSource) {
@@ -186,12 +177,10 @@
                         this.resistanceInput.disabled = true;
                         this.currentInput.disabled = true;
                     } else if (component.name === "Switch") {
-                        //console.log("updating inputs for switch");
                         this.voltageInput.disabled = true;
                         this.resistanceInput.disabled = true;
                         this.currentInput.disabled = true;
                     } else {
-                     //   console.log("updating inputs for component:", component.name);
                         this.voltageInput.disabled = true;
                         this.resistanceInput.disabled = false;
                         this.currentInput.disabled = true;
@@ -219,17 +208,14 @@
                 }
 
             }
+            //Chnages the value of the component based on the input fields, and updates the circuit accordingly.
             saveInputs(component) {
                 if (component.calculatorComponent) {
                     if (component.calculatorComponent instanceof VoltageSource) {
                         component.calculatorComponent.setVoltage(parseFloat(this.voltageInput.value));
-                    } else if (component.name === "Switch") {
-                       // console.log("switches don't have inputs to save");
-                    } else {
+                    } else if (component.name !== "Switch") {
                         component.calculatorComponent.setResistance(parseFloat(this.resistanceInput.value));
                     }
-                } else {
-                   // console.log("component does not have a calculator component to save inputs to");
                 }
             }
         }

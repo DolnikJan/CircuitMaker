@@ -8,7 +8,7 @@
             selectedComponent = null;
             timer = false;
 
-
+            //Creates a new component, adds it to the canvas, and sets up its properties.
             addComponent(url, name) {
                 fabric.Image.fromURL(url).then((img) => {
                     img.name = name;
@@ -18,7 +18,7 @@
                     return img;
                 });
             }
-
+            //Deletes a component from the canvas and the circuit, removing any wires connected to it and updating the circuit accordingly.
             deleteComponent(component) {
 
                 if (!component) return;
@@ -32,15 +32,14 @@
                 }
 
                 setTimeout(() => {
-                    //console.log("Removing component from canvas:", component);
-                    this.canvas.discardActiveObject();
+                     this.canvas.discardActiveObject();
                     this.canvas.remove(component);
                     this.canvas.requestRenderAll();
                 }, 100);
                 this.circuitManager.uiManager.hideButtons();
                 this.circuitManager.calculateCircuit();
             }
-
+            //Returns the positions of the plus and minus connections of a component, based on its rotation.
             getConnectionPositions(component) {
                 let positions = [];
                 switch (component.positionOfRotation) {
@@ -63,7 +62,7 @@
                 }
                 return positions;
             }
-
+            //Sets up the properties of a new component, including its position, scale, connection positions wetc
             setUpComponent(img) {
                 let color = [Math.random() * 256, Math.random() * 256, Math.random() * 256];
                 img.set({
@@ -114,7 +113,7 @@
                 this.canvas.add(img);
                 this.canvas.requestRenderAll();
             }
-
+            //Rotates a component 90 degrees clockwise, and updates its connection positions accordingly.
             rotateComponent(component) {
                 component.rotate((component.angle + 90) % 360);
                 component.set({
@@ -142,7 +141,7 @@
 
                 this.canvas.requestRenderAll();
             }
-
+            //Updates the positions of the lines connected to a component, based on its current position and rotation.
             updateConnectionPositions(component) {
                 let positions = this.getConnectionPositions(component);
                 component.lines1.forEach((line) => {
@@ -176,7 +175,7 @@
 
                 this.canvas.requestRenderAll();
             }
-
+            //Updates the value of a component (resistance or voltage), based on user input in the UI.
             updateComponentValue(component, value) {
                 value = parseFloat(value);
                 if (component.calculatorComponent) {
@@ -190,11 +189,10 @@
                     }
                 }
             }
+            //Toggles the state of a switch component, and updates its image and resistance accordingly.
             turnSwitch(component) {
                 if (component.name === "Switch") {
-                    console.log("toggling switch"+component.isOn);
                     if (component.isOn) {
-                        console.log("turning off switch");
                         component.setSrc('./images/switch_off.png').then(() => {
                             component.calculatorComponent.resistance = 100000000;
                             component.isOn = false;
@@ -203,7 +201,6 @@
                             this.circuitManager.calculateCircuit();
                         });
                     } else {
-                        console.log("turning on switch");
                        
                         component.setSrc('./images/switch_on.png').then(() => {
                             component.calculatorComponent.resistance = 1e-10;
@@ -214,20 +211,17 @@
                         });
                     }
                 } else {
-                    console.log("frick you weathor boy)");
                     return;
                 }
             }
-            
+            //Updates the image of a light bulb component based on whether it is on or off (may add different brightness levels later based on current).
             updateBrightnessOfBulb(component) {
                 if (component.name === "Light Bulb") {
                     if(component.calculatorComponent.current !== 0) {
-                        console.log("turning on light bulb");
                         component.setSrc('./images/light_bulb_on.png').then(() => {
                             this.canvas.requestRenderAll();
                         });
                 } else {
-                    console.log("turning off light bulb");
                     component.setSrc('./images/light_bulb_off.png').then(() => {
                         this.canvas.requestRenderAll();
                     });
